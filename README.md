@@ -14,7 +14,7 @@ Testing with smblient 4.9.1
 ```javascript
 const SambaClient = require('samba-client');
 
-let client = new SambaClient({
+const client = new SambaClient({
     address: '//server/folder', // required (Can use '\\\\server\\folder' syntaxe)
     username: 'test', // not required, defaults to guest
     password: 'test', // not required
