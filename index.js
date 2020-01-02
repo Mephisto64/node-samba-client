@@ -17,7 +17,7 @@ function wrap(str) {
 
 class SambaClient {
   constructor(options) {
-    this.address = options.address;
+    this.address = wrap(options.address);
     this.username = wrap(options.username || 'guest');
     this.password = options.password ? wrap(options.password) : null;
     this.domain = options.domain;

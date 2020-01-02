@@ -1,22 +1,22 @@
 {
-  "name": "samba-client",
-  "version": "3.0.0",
-  "description": "wrapper for smbclient",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/eflexsystems/node-samba-client.git"
-  },
-  "keywords": [
-    "samba",
-    "smb",
-    "cifs",
-    "smbclient"
-  ],
-  "author": "eFlex Systems",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/eflexsystems/node-samba-client/issues"
-  },
-  "homepage": "https://github.com/eflexsystems/node-samba-client"
+    "name": "samba-client",
+    "version": "3.0.1",
+    "description": "wrapper for smbclient",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Mephisto64/node-samba-client.git"
+    },
+    "keywords": [
+        "samba",
+        "smb",
+        "cifs",
+        "smbclient"
+    ],
+    "author": "Mephisto64",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Mephisto64/node-samba-client/issues"
+    },
+    "homepage": "https://github.com/Mephisto64/node-samba-client"
 }
