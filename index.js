@@ -16,6 +16,23 @@ function wrap(str) {
 }
 
 class SambaClient {
+     /**
+      * smbclient contructor - the connection attempt is made when using a method
+      * @constructor SambaClient
+      * @param {object} options Options for smbclient
+      * @param {string} options.address Address of share : `'\\\\server\\share'`
+      * @param {string} [options.username=guest] User account name : `'test'`
+      * @param {string} [options.password] Password of user account : `'test'`
+      * @param {string} [options.domain] Domain of user account : `'WORKGROUP'`
+      * @example new SambaClient({address: '\\\\server\\share'});
+      * @example
+      * new SambaClient({
+      *     address: '\\\\server\\share',
+      *     username: 'test',
+      *     password: 'test',
+      *     domain: 'WORKGROUP'
+      * });
+      */
     constructor(options) {
         this.address = wrap(options.address);
         this.username = wrap(options.username || 'guest');
@@ -23,10 +40,24 @@ class SambaClient {
         this.domain = options.domain;
     }
 
+    /**
+     * Get file from remote SMB share
+     * @param {string} path Remote relative file path
+     * @param {string} destination Local file path
+     * @example
+     * client.getFile('remote folder\\a file', '/tmp/local folder/new file');
+     */
     getFile(path, destination) {
         return this.runCommand('get', path, destination);
     }
 
+    /**
+     * Send file to remote SMB share
+     * @param {string} path Local file path
+     * @param {string} destination Remote relative file path
+     * @example
+     * client.sendFile('/tmp/local folder/a file', 'remote folder\\new file');
+     */
     sendFile(path, destination) {
         return this.runCommand('put', path, destination.replace(singleSlash, '\\'));
     }
