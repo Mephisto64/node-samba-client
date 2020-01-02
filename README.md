@@ -7,6 +7,8 @@ Node.js wrapper for smbclient
 Requires Node.js 10+
 Smbclient must be installed. This can be installed on Ubuntu with `sudo apt-get install smbclient`.
 
+Testing with smblient 4.9.1
+
 ## API
 
 ```javascript
