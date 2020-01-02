@@ -1,6 +1,8 @@
-# node-samba-client
+# node-smb-client
 
 Node.js wrapper for smbclient
+
+Fork of <https://github.com/eflexsystems/node-samba-client> on 2020-01-01
 
 ## Requirements
 
