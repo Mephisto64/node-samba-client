@@ -24,7 +24,8 @@ const client = new SambaClient({
     address: '//server/share', // required (Can use '\\\\server\\share' syntax)
     username: 'test', // not required, defaults to guest
     password: 'test', // not required
-    domain: 'WORKGROUP' // not required
+    domain: 'WORKGROUP', // not required
+    port: 8080 // not required
 });
 
 // send a file

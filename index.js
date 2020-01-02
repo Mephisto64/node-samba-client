@@ -11,8 +11,87 @@ const singleSlash = /\//g;
  */
 const missingFileRegex = /(NT_STATUS_OBJECT_NAME_NOT_FOUND|NT_STATUS_NO_SUCH_FILE)/im;
 
-function wrap(str) {
-    return '\'' + str + '\'';
+const fn = {
+    /**
+     * Protects the character string with quotes
+     * @param {string} str String value to protect
+     * @example the value => 'the value'
+     */
+    wrap(str) {
+        return '\'' + str + '\'';
+    },
+    /**
+     * Contruct command line
+     * @param {string} fullCmd command line
+     * @param {SambaClient} client instance of SambaClient
+     */
+    getSmbClientArgs(fullCmd, client) {
+        const args = ['-U', client.username];
+
+        if (!client.password) {
+            args.push('-N');
+        }
+
+        args.push('-c', fullCmd, client.address);
+
+        if (client.password) {
+            args.push(client.password);
+        }
+
+        if (client.domain) {
+            args.push('-W');
+            args.push(client.domain);
+        }
+
+        if (client.port) {
+            args.push('-p');
+            args.push(client.port);
+        }
+
+        return args;
+    },
+    /**
+     * Execute command
+     * @param {string} cmd command line
+     * @param {string} cmdArgs command line arguments
+     * @param {string} workingDir Working directory path
+     * @param {SambaClient} client SambaClient instance
+     */
+    execute(cmd, cmdArgs, workingDir, client) {
+        const fullCmd = fn.wrap(util.format('%s %s', cmd, cmdArgs));
+        const command = ['smbclient', fn.getSmbClientArgs(fullCmd, client).join(' ')].join(' ');
+
+        const options = {
+            cwd: workingDir
+        };
+
+        return new Promise((resolve, reject) => {
+            exec(command, options, function (err, stdout, stderr) {
+                let allOutput = stdout + stderr;
+
+                if (err) {
+                    err.message += allOutput;
+                    return reject(err);
+                }
+
+                return resolve(allOutput);
+            });
+        });
+    },
+    /**
+     * Prepare command
+     * @param {string} cmd command line
+     * @param {string} path file path
+     * @param {string} destination file path
+     * @param {SambaClient} client SambaClient instance
+     */
+    runCommand(cmd, path, destination, client) {
+        let workingDir = p.dirname(path);
+        let fileName = p.basename(path).replace(singleSlash, '\\');
+        let cmdArgs = util.format('"%s" "%s"', fileName, destination);
+
+        return fn.execute(cmd, cmdArgs, workingDir, client);
+    }
 }
 
 class SambaClient {
@@ -24,20 +103,23 @@ class SambaClient {
       * @param {string} [options.username=guest] User account name : `'test'`
       * @param {string} [options.password] Password of user account : `'test'`
       * @param {string} [options.domain] Domain of user account : `'WORKGROUP'`
+      * @param {string} [options.port] Connection port : `139`
       * @example new SambaClient({address: '\\\\server\\share'});
       * @example
       * new SambaClient({
       *     address: '\\\\server\\share',
       *     username: 'test',
       *     password: 'test',
-      *     domain: 'WORKGROUP'
+      *     domain: 'WORKGROUP',
+      *     port: 139
       * });
       */
     constructor(options) {
-        this.address = wrap(options.address);
-        this.username = wrap(options.username || 'guest');
-        this.password = options.password ? wrap(options.password) : null;
+        this.address = fn.wrap(options.address);
+        this.username = fn.wrap(options.username || 'guest');
+        this.password = options.password ? fn.wrap(options.password) : null;
         this.domain = options.domain;
+        this.port = options.port;
     }
 
     /**
@@ -48,7 +130,7 @@ class SambaClient {
      * client.getFile('remote folder\\a file', '/tmp/local folder/new file');
      */
     getFile(path, destination) {
-        return this.runCommand('get', path, destination);
+        return fn.runCommand('get', path, destination, this);
     }
 
     /**
@@ -59,17 +141,17 @@ class SambaClient {
      * client.sendFile('/tmp/local folder/a file', 'remote folder\\new file');
      */
     sendFile(path, destination) {
-        return this.runCommand('put', path, destination.replace(singleSlash, '\\'));
+        return fn.runCommand('put', path, destination.replace(singleSlash, '\\'), this);
     }
 
     deleteFile(fileName) {
-        return this.execute('del', fileName, '');
+        return fn.execute('del', fileName, '', this);
     }
 
     async listFiles(fileNamePrefix, fileNameSuffix) {
         try {
             let cmdArgs = util.format('%s*%s', fileNamePrefix, fileNameSuffix);
-            let allOutput = await this.execute('dir', cmdArgs, '');
+            let allOutput = await fn.execute('dir', cmdArgs, '', this);
             let fileList = [];
             let lines = allOutput.split('\n');
             for (let i = 0; i < lines.length; i++) {
@@ -90,11 +172,11 @@ class SambaClient {
     }
 
     mkdir(remotePath) {
-        return this.execute('mkdir', remotePath.replace(singleSlash, '\\'), __dirname);
+        return fn.execute('mkdir', remotePath.replace(singleSlash, '\\'), __dirname, this);
     }
 
     dir(remotePath) {
-        return this.execute('dir', remotePath.replace(singleSlash, '\\'), __dirname);
+        return fn.execute('dir', remotePath.replace(singleSlash, '\\'), __dirname, this);
     }
 
     async fileExists(remotePath) {
@@ -108,57 +190,6 @@ class SambaClient {
                 throw e;
             }
         }
-    }
-
-    getSmbClientArgs(fullCmd) {
-        let args = ['-U', this.username];
-
-        if (!this.password) {
-            args.push('-N');
-        }
-
-        args.push('-c', fullCmd, this.address);
-
-        if (this.password) {
-            args.push(this.password);
-        }
-
-        if (this.domain) {
-            args.push('-W');
-            args.push(this.domain);
-        }
-
-        return args;
-    }
-
-    execute(cmd, cmdArgs, workingDir) {
-        let fullCmd = wrap(util.format('%s %s', cmd, cmdArgs));
-        let command = ['smbclient', this.getSmbClientArgs(fullCmd).join(' ')].join(' ');
-
-        let options = {
-            cwd: workingDir
-        };
-
-        return new Promise((resolve, reject) => {
-            exec(command, options, function (err, stdout, stderr) {
-                let allOutput = stdout + stderr;
-
-                if (err) {
-                    err.message += allOutput;
-                    return reject(err);
-                }
-
-                return resolve(allOutput);
-            });
-        });
-    }
-
-    runCommand(cmd, path, destination) {
-        let workingDir = p.dirname(path);
-        let fileName = p.basename(path).replace(singleSlash, '\\');
-        let cmdArgs = util.format('"%s" "%s"', fileName, destination);
-
-        return this.execute(cmd, cmdArgs, workingDir);
     }
 
     getAllShares() {
