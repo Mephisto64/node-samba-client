@@ -1,5 +1,5 @@
 {
-    "name": "smb-client",
+    "name": "smb-unix-client",
     "version": "3.0.1",
     "description": "wrapper for smbclient",
     "main": "index.js",
