@@ -1,5 +1,25 @@
 # Changelog
 
+* **3.2.0** - 2020-01-03  
+Adding encrypt option possibility for SMB3
+
+```javascript
+const SambaClient = require('smb-unix-client');
+
+const test = async () => {
+    const client = new SambaClient({
+        address: '\\\\server\\folder', // required
+        username: 'test', // not required, defaults to guest
+        password: 'test', // not required
+        domain: 'WORKGROUP', // not required
+        port: 139,
+        encrypt: true
+    });
+};
+
+test();
+```
+
 * **3.1.0** - 2020-01-02  
 Adding port option possibility and privatization of internal class functions
 

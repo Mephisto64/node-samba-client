@@ -29,7 +29,8 @@ const client = new SambaClient({
     username: 'test', // not required, defaults to guest
     password: 'test', // not required
     domain: 'WORKGROUP', // not required
-    port: 8080 // not required
+    port: 8080, // not required
+    encrypt: true
 });
 
 // send a file

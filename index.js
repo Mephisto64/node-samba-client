@@ -48,6 +48,10 @@ const fn = {
             args.push(client.port);
         }
 
+        if (client.encrypt) {
+            args.push('-e');
+        }
+
         return args;
     },
     /**
@@ -104,6 +108,7 @@ class SambaClient {
       * @param {string} [options.password] Password of user account : `'test'`
       * @param {string} [options.domain] Domain of user account : `'WORKGROUP'`
       * @param {string} [options.port] Connection port (default 445) : `139`
+      * @param {boolean} [options.encrypt=false] Encryption negotiation : `true`
       * @example new SambaClient({address: '\\\\server\\share'});
       * @example
       * new SambaClient({
@@ -111,7 +116,8 @@ class SambaClient {
       *     username: 'test',
       *     password: 'test',
       *     domain: 'WORKGROUP',
-      *     port: 139
+      *     port: 139,
+      *     encrypt: true
       * });
       */
     constructor(options) {
@@ -120,6 +126,7 @@ class SambaClient {
         this.password = options.password ? fn.wrap(options.password) : null;
         this.domain = options.domain;
         this.port = options.port;
+        this.encrypt = options.encrypt;
     }
 
     /**
