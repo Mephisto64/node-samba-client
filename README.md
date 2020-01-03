@@ -1,5 +1,9 @@
 # node-samba-client
 
+![GitHub package.json version](https://img.shields.io/github/package-json/v/Mephisto64/node-samba-client?color=r&label=npm&style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues-raw/Mephisto64/node-samba-client?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/Mephisto64/node-samba-client?style=flat-square)
+
 Nodejs [smb-unix-client](https://www.npmjs.com/package/smb-unix-client) wrapper for smbclient
 
 Fork of [samba-client](https://github.com/eflexsystems/node-samba-client) on 2020-01-01 at version 3.0.0
