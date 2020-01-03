@@ -103,7 +103,7 @@ class SambaClient {
       * @param {string} [options.username=guest] User account name : `'test'`
       * @param {string} [options.password] Password of user account : `'test'`
       * @param {string} [options.domain] Domain of user account : `'WORKGROUP'`
-      * @param {string} [options.port] Connection port : `139`
+      * @param {string} [options.port] Connection port (default 445) : `139`
       * @example new SambaClient({address: '\\\\server\\share'});
       * @example
       * new SambaClient({
